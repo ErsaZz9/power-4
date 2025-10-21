@@ -1,31 +1,20 @@
-/* Effet de lueur sanglante sur le titre */
-h1 {
-  color: var(--orange);
-  text-shadow: 0 0 15px var(--violet), 0 0 25px var(--accent);
+#background-video {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;   /* largeur = 100% de la fenêtre */
+  height: 100vh;  /* hauteur = 100% de la fenêtre */
+  object-fit: cover; /* couvre tout sans déformer */
+  z-index: -1;    /* derrière tout le reste */
 }
 
-/* Petits effets sur le plateau */
-.board td:hover {
-  background-color: rgba(255, 102, 0, 0.2); /* légère surbrillance au survol */
-  transition: 0.3s;
-}
-
-/* Animation des jetons */
-.token-orange, .token-violet {
-  animation: appear 0.5s ease;
-}
-
-/* Animation d’apparition (les jetons “descendent”) */
-@keyframes appear {
-  0% { transform: translateY(-30px); opacity: 0; }
-  100% { transform: translateY(0); opacity: 1; }
-}
-/* Vidéo au-dessus du titre */
-.header-video video {
-  max-width: 300px;      /* largeur maximale de la vidéo */
-  height: auto;           /* conserve les proportions */
-  display: block;         /* affiche en bloc */
-  margin: 0 auto 10px;    /* centre et espace avec le titre */
-  border-radius: 10px;    /* coins arrondis pour un style sympa */
-  box-shadow: 0 0 15px orange; /* légère lueur Halloween */
+/* --- le contenu au-dessus --- */
+.content {
+  position: relative;
+  z-index: 1; /* au-dessus de la vidéo */
+  color: white;
+  text-align: center;
+  font-family: Arial, sans-serif;
+  margin-top: 40vh;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.8);
 }
