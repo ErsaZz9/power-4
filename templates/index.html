@@ -1,51 +1,13 @@
-<!DOCTYPE html> <!-- Indique que c’est un document HTML5 -->
+<!doctype html>
+<html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vidéo en fond</title>
-  <style>
-    /* La vidéo couvre tout l’écran */
-    #background-video {
-      position: fixed; /* reste en place même si on scrolle */
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover; /* couvre tout l’écran sans déformer */
-      z-index: -1; /* derrière tout le reste */
-    }
-
-    /* Contenu par-dessus */
-    .content {
-      position: relative;
-      z-index: 1;
-      color: white;
-      text-align: center;
-      top: 40vh;
-      font-family: Arial, sans-serif;
-      text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
-    }
-
-    body {
-      margin: 0;
-      height: 100vh;
-      overflow: hidden;
-    }
-  </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Puissance 4 — fond vidéo</title>
+  <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
-
-  <!-- Vidéo de fond -->
-  <video id="background-video" autoplay muted loop playsinline>
-    <source src="halloween.mp4" type="halloween/mp4">
+  <video id="bg-video" autoplay muted loop playsinline preload="metadata" poster="/static/videos/poster.jpg">
+    <source src="/static/videos/halloween.mp4" type="video/mp4">
     Votre navigateur ne supporte pas la vidéo.
   </video>
-
-  <!-- Contenu -->
-  <div class="content">
-    <h1>Bienvenue sur mon site</h1>
-    <p>Texte au-dessus de la vidéo 🌊</p>
-  </div>
-
-</body>
-</html>
