@@ -1,30 +1,31 @@
 package main
 
 import (
+	"fmt"
 	"html/template"
-	"log"
 	"net/http"
-	"path/filepath"
 )
 
-func main() {
-	tmplPath := filepath.Join("templates", "index.html")
-	tmpl := template.Must(template.ParseFiles(tmplPath))
+// Structure de données envoyée au HTML
+type PageData struct {
+	Titre string
+}
 
+// Fonction principale
+func main() {
+	// Chargement du template HTML (index.html)
+	tmpl := template.Must(template.ParseFiles("templates/index.html"))
+
+	// Route principale "/"
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		if err := tmpl.Execute(w, nil); err != nil {
-			http.Error(w, "Erreur serveur", http.StatusInternalServerError)
-			log.Println("template execute:", err)
-		}
+		data := PageData{Titre: "👻 Power4 Halloween 🎃"} // Données à envoyer
+		tmpl.Execute(w, data)                           // Affiche le HTML
 	})
 
-	// Servir les fichiers statiques (CSS, vidéo...)
-	fs := http.FileServer(http.Dir("static"))
-	http.Handle("/static/", http.StripPrefix("/static/", fs))
+	// Route pour les fichiers statiques (CSS, vidéo, images…)
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
-	addr := ":8080"
-	log.Printf("Serveur démarré sur http://localhost%s\n", addr)
-	if err := http.ListenAndServe(addr, nil); err != nil {
-		log.Fatal(err)
-	}
+	// Lancer le serveur sur localhost:8080
+	fmt.Println("Serveur lancé sur http://localhost:8080")
+	http.ListenAndServe(":8080", nil)
 }
