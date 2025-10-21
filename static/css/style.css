@@ -1,31 +1,201 @@
-/* Effet de lueur sanglante sur le titre */
+/* Variables du thème Halloween (Violet, Orange, Fond sombre/Sang) */
+:root {
+    --player1: #9400D3; /* Violet Profond (Jeton Joueur 1) */
+    --player2: #FF8C00; /* Orange Citrouille (Jeton Joueur 2) */
+    --board-color: #333333; /* Noir/Gris sombre (Couleur du plateau) */
+    --empty: #1A1A1A; /* Fond de trou très sombre */
+    --background: #121212; /* Fond de page sombre */
+    --blood-red: #8B0000; /* Rouge Sang pour les accents et boutons */
+    --board-width: 630px; 
+    --cell-size: 80px;
+}
+
+/* Styles de base et ambiance sombre */
+body {
+    font-family: 'Times New Roman', serif; /* Police plus "gothique" */
+    background-color: var(--background);
+    color: #E0E0E0; /* Texte clair */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+
+.container {
+    background-color: #242424; /* Conteneur légèrement moins sombre */
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(255, 140, 0, 0.4); /* Ombre d'aura orange */
+    border: 2px solid var(--blood-red);
+}
+
+/* EFFET AJOUTÉ : Lueur sanglante sur le titre (utilisant les bonnes variables) */
 h1 {
-  color: var(--orange);
-  text-shadow: 0 0 15px var(--violet), 0 0 25px var(--accent);
+    color: var(--player2); /* Orange */
+    text-align: center;
+    text-shadow: 0 0 10px var(--player1), 0 0 20px var(--blood-red); /* Violet et Sang */
+    margin-bottom: 10px;
+    transition: all 0.3s ease;
 }
 
-/* Petits effets sur le plateau */
-.board td:hover {
-  background-color: rgba(255, 102, 0, 0.2); /* légère surbrillance au survol */
-  transition: 0.3s;
+.subtitle {
+    text-align: center;
+    color: #AAAAAA;
+    margin-bottom: 25px;
 }
 
-/* Animation des jetons */
-.token-orange, .token-violet {
-  animation: appear 0.5s ease;
+/* EFFET AJOUTÉ : Style pour la vidéo d'entête (si ajoutée) */
+.header-video {
+    margin: 0 auto 15px;
+}
+.header-video video {
+    max-width: 300px; /* largeur maximale de la vidéo */
+    height: auto; 
+    display: block; 
+    border-radius: 10px; 
+    box-shadow: 0 0 15px var(--player2); /* légère lueur orange Halloween */
+    border: 2px solid var(--blood-red);
+}
+
+
+/* Message Box */
+.message {
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 1.1em;
+    font-weight: bold;
+    border: 1px solid #444;
+    transition: all 0.3s ease;
+}
+.message.player1-turn { background-color: var(--player1); color: white; }
+.message.player2-turn { background-color: var(--player2); color: #333; }
+.message.win { 
+    background-color: var(--blood-red); 
+    color: white; 
+    box-shadow: 0 0 15px var(--blood-red);
+    animation: pulse 1.5s infinite; /* Animation de pulsation pour la victoire */
+}
+.message.draw { background-color: #555; color: white; }
+.message.info { background-color: #383838; color: #CCCCCC; }
+
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.02); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* Board structure */
+.board-container {
+    width: var(--board-width);
+    max-width: 100%;
+    margin: 0 auto 20px;
+    background-color: var(--board-color);
+    border-radius: 10px;
+    padding: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.8), inset 0 0 10px rgba(255, 255, 255, 0.1);
+}
+
+.board-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px; /* Écart réduit */
+}
+
+/* Cell and Hole */
+.cell {
+    position: relative;
+    width: 100%;
+    padding-top: 100%; 
+    background-color: var(--board-color); 
+}
+
+/* EFFET AJOUTÉ : Hover sur la zone de jeu (les cellules cliquables sont les boutons) */
+/* Ce style s'applique aux boutons (contrôles) au-dessus du plateau */
+.controls button:hover {
+    background-color: #A00000;
+    transform: scale(1.05);
+    /* Ajout d'une lueur légère pour le feedback visuel */
+    box-shadow: 0 0 8px rgba(255, 140, 0, 0.7); 
+}
+
+
+.hole {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    height: 90%;
+    background-color: var(--empty); 
+    border-radius: 50%;
+    box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.7);
+}
+
+/* Pieces */
+.hole.player-1 { 
+    background-color: var(--player1); 
+    box-shadow: 0 0 10px var(--player1); 
+    animation: appear 0.5s ease; /* AJOUT de l'animation */
+}
+.hole.player-2 { 
+    background-color: var(--player2); 
+    box-shadow: 0 0 10px var(--player2); 
+    background-image: radial-gradient(circle at 35% 35%, #FFFDD0 5%, var(--player2) 60%);
+    animation: appear 0.5s ease; /* AJOUT de l'animation */
 }
 
 /* Animation d’apparition (les jetons “descendent”) */
 @keyframes appear {
-  0% { transform: translateY(-30px); opacity: 0; }
-  100% { transform: translateY(0); opacity: 1; }
+    0% { transform: translate(-50%, -150%); opacity: 0; } /* Commence beaucoup plus haut */
+    100% { transform: translate(-50%, -50%); opacity: 1; }
 }
-/* Vidéo au-dessus du titre */
-.header-video video {
-  max-width: 300px;      /* largeur maximale de la vidéo */
-  height: auto;           /* conserve les proportions */
-  display: block;         /* affiche en bloc */
-  margin: 0 auto 10px;    /* centre et espace avec le titre */
-  border-radius: 10px;    /* coins arrondis pour un style sympa */
-  box-shadow: 0 0 15px orange; /* légère lueur Halloween */
+
+/* Form Controls */
+.controls {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+    width: var(--board-width);
+    max-width: 100%;
+    margin: 10px auto;
+}
+
+.controls button {
+    background-color: var(--blood-red); /* Boutons rouge sang */
+    color: white;
+    padding: 10px 5px;
+    border: 2px solid #500090;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+.controls button:disabled {
+    background-color: #444;
+    border-color: #333;
+    cursor: not-allowed;
+    color: #888;
+    transform: scale(1);
+}
+
+/* Bouton de réinitialisation */
+.reset-button {
+    margin-top: 25px;
+    padding: 10px 20px;
+    background-color: var(--player1);
+    color: white;
+    border: 2px solid #500090;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    text-decoration: none; /* Règle pour <a> */
+    display: block;
+    text-align: center;
+}
+
+.reset-button:hover {
+    background-color: #6A00A8;
 }
