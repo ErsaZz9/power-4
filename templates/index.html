@@ -1,0 +1,96 @@
+<!DOCTYPE html> <!-- Indique que c’est un document HTML5 -->
+<head>
+  <meta charset="utf-8"> <!-- Permet d’utiliser les caractères spéciaux (accents, emoji...) -->
+  <meta name="viewport" content="width=device-width, initial-scale=1"> <!-- Rend la page responsive (adaptée à mobile et PC) -->
+  <title>Power4 — Halloween Edition</title> <!-- Titre de l’onglet de la page -->
+
+  <!-- Lien vers le fichier CSS dans le dossier static/css -->
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body> <!-- Début du corps de la page -->
+  <div class="container"> <!-- Conteneur principal qui regroupe tout le contenu de la page -->
+
+    <header> <!-- En-tête du jeu -->
+      <header>
+  <!-- Vidéo Halloween -->
+  <div class="header-video">
+    <video autoplay loop muted>
+      <source src="/static/videos/halloween.mp4" type="video/mp4">
+      Votre navigateur ne supporte pas les vidéos.
+    </video>
+  </div>
+
+  <!-- Titre du jeu -->
+  <h1>Power4 — Halloween Edition</h1>
+
+  <!-- Sous-titre avec le joueur actuel -->
+  <p class="subtitle">
+    Tour du joueur : {{.Turn}}
+    {{if .Over}} • Partie terminée (Gagnant: {{.Winner}}) {{end}}
+  </p>
+</header>
+<h1>Power4 — Halloween Edition</h1> <!-- Titre principal affiché en haut de la page -->
+      
+      <!-- Sous-titre qui indique le joueur actuel -->
+      <p class="subtitle">
+        Tour du joueur : {{.Turn}} <!-- Le backend (Go) injecte le joueur actuel ici -->
+        {{if .Over}} • Partie terminée (Gagnant: {{.Winner}}) {{end}} <!-- Si la partie est terminée, affiche le gagnant -->
+      </p>
+
+      <!-- Message du “robot” (texte généré aléatoirement côté Go) -->
+      <div class="robot-msg">{{.RobotMsg}}</div>
+    </header>
+
+    <!-- Plateau de jeu sous forme de tableau HTML -->
+    <table class="board"> <!-- Contient la grille du Puissance 4 -->
+      {{range $rIndex, $row := .Board}} <!-- Boucle Go : parcourt chaque ligne de la grille -->
+      <tr> <!-- Nouvelle ligne du tableau -->
+        {{range $cIndex, $cell := $row}} <!-- Boucle Go : parcourt chaque cellule de la ligne -->
+        <td class="cell"> <!-- Une cellule du plateau -->
+          {{if eq $cell 1}}
+            <!-- Si la cellule vaut 1 → joueur 1 (orange) -->
+            <div class="token token-orange">🎃</div> <!-- Jeton orange en forme de citrouille -->
+          {{else if eq $cell 2}}
+            <!-- Si la cellule vaut 2 → joueur 2 (violet) -->
+            <div class="token token-violet">👻</div> <!-- Jeton violet en forme de fantôme -->
+          {{else}}
+            <!-- Sinon cellule vide -->
+            <div class="token empty">&nbsp;</div> <!-- Case vide (affiche juste un fond) -->
+          {{end}}
+        </td>
+        {{end}} <!-- Fin de la boucle colonnes -->
+      </tr> <!-- Fin de la ligne -->
+      {{end}} <!-- Fin de la boucle lignes -->
+    </table>
+
+    <!-- Zone des boutons pour jouer -->
+    <div class="controls"> <!-- Conteneur des boutons -->
+      <!-- Formulaire pour envoyer la colonne jouée -->
+      <form action="/play" method="post"> <!-- Quand on clique sur un bouton, envoie une requête POST à /play -->
+        <!-- Chaque bouton correspond à une colonne du plateau -->
+        <button name="col" value="0">0</button> <!-- Joue dans la colonne 0 -->
+        <button name="col" value="1">1</button> <!-- Joue dans la colonne 1 -->
+        <button name="col" value="2">2</button> <!-- Joue dans la colonne 2 -->
+        <button name="col" value="3">3</button> <!-- Joue dans la colonne 3 -->
+        <button name="col" value="4">4</button> <!-- Joue dans la colonne 4 -->
+        <button name="col" value="5">5</button> <!-- Joue dans la colonne 5 -->
+        <button name="col" value="6">6</button> <!-- Joue dans la colonne 6 -->
+      </form>
+
+      <!-- Formulaire pour recommencer une partie -->
+      <form action="/reset" method="post"> <!-- Quand on clique dessus, redémarre une nouvelle partie -->
+        <button type="submit" class="reset-btn">Nouvelle partie</button> <!-- Bouton rouge “Nouvelle partie” -->
+      </form>
+    </div>
+
+    <!-- Musique d’ambiance Halloween -->
+    <audio id="bg-audio" src="/static/sounds/halloween.mp3" autoplay loop></audio>
+    <!-- “autoplay” : la musique démarre automatiquement -->
+    <!-- “loop” : la musique recommence quand elle se termine -->
+  </div>
+
+  <!-- Script JS pour gérer les effets visuels et les sons -->
+  <script src="/static/js/app.js"></script>
+</body>
+</html> <!-- Fin du document HTML -->
