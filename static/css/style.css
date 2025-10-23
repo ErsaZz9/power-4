@@ -10,23 +10,59 @@
     --cell-size: 80px;
 }
 
+/* --- IMAGE DE FOND STATIQUE (NON MODIFIABLE) --- */
+/* Fixe l'image pour couvrir tout le viewport (écran) et la met en arrière-plan */
+#background-image {
+    position: fixed; /* Reste fixe même en faisant défiler */
+    top: 0;
+    left: 0;
+    min-width: 100%; 
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    z-index: -100; /* Le met complètement derrière tout le contenu */
+    object-fit: cover; /* Assure que l'image couvre l'écran sans déformation */
+    opacity: 0.4; /* Opacité de l'image de fond */
+    filter: brightness(0.6); /* Assombrit un peu l'image pour un meilleur contraste */
+    pointer-events: none; /* Empêche l'utilisateur d'interagir avec elle */
+}
+
 /* Styles de base et ambiance sombre */
 body {
+    /* Le fond du body doit être transparent ou utiliser les couleurs du conteneur, car l'image est en z-index -100 */
+    background-color: transparent; 
     font-family: 'Times New Roman', serif; /* Police plus "gothique" */
-    background-color: var(--background);
     color: #E0E0E0; /* Texte clair */
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 20px;
+    /* Retire le padding et les marges par défaut */
+    margin: 0;
+    padding: 0;
 }
+
+/* Le wrapper du contenu du jeu qui flotte au-dessus du fond */
+.game-overlay {
+    position: relative; 
+    z-index: 10;
+    min-height: 100vh; /* S'assure que le contenu prend toute la hauteur de l'écran */
+    width: 100%;
+    display: flex; 
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 0; /* Ajoute un peu d'air en haut et en bas */
+}
+
 
 .container {
     background-color: #242424; /* Conteneur légèrement moins sombre */
     padding: 30px;
     border-radius: 15px;
-    box-shadow: 0 0 20px rgba(255, 140, 0, 0.4); /* Ombre d'aura orange */
+    box-shadow: 0 0 20px var(--player2); /* Ombre d'aura orange */
     border: 2px solid var(--blood-red);
+    /* S'assure qu'il est centré horizontalement */
+    max-width: 700px;
+    width: 90%;
 }
 
 /* EFFET AJOUTÉ : Lueur sanglante sur le titre (utilisant les bonnes variables) */
@@ -38,28 +74,8 @@ h1 {
     transition: all 0.3s ease;
 }
 
-.subtitle {
-    text-align: center;
-    color: #AAAAAA;
-    margin-bottom: 25px;
-}
-
-/* EFFET AJOUTÉ : Style pour la vidéo d'entête (si ajoutée) */
-.header-video {
-    margin: 0 auto 15px;
-}
-.header-video video {
-    max-width: 300px; /* largeur maximale de la vidéo */
-    height: auto; 
-    display: block; 
-    border-radius: 10px; 
-    box-shadow: 0 0 15px var(--player2); /* légère lueur orange Halloween */
-    border: 2px solid var(--blood-red);
-}
-
-
 /* Message Box */
-.message {
+.message-box {
     padding: 15px;
     margin-bottom: 20px;
     border-radius: 8px;
@@ -68,26 +84,30 @@ h1 {
     font-weight: bold;
     border: 1px solid #444;
     transition: all 0.3s ease;
+    background-color: #383838;
 }
-.message.player1-turn { background-color: var(--player1); color: white; }
-.message.player2-turn { background-color: var(--player2); color: #333; }
-.message.win { 
+
+.message-box p {
+    margin: 5px 0; /* Assure que le texte du message est bien espacé */
+}
+
+/* Animation de pulsation pour la victoire */
+.message-box.win { 
     background-color: var(--blood-red); 
     color: white; 
     box-shadow: 0 0 15px var(--blood-red);
-    animation: pulse 1.5s infinite; /* Animation de pulsation pour la victoire */
+    animation: pulse 1.5s infinite; 
 }
-.message.draw { background-color: #555; color: white; }
-.message.info { background-color: #383838; color: #CCCCCC; }
-
 @keyframes pulse {
     0% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.02); opacity: 0.8; }
+    50% { transform: scale(1.02); opacity: 0.9; }
     100% { transform: scale(1); opacity: 1; }
 }
 
+
 /* Board structure */
-.board-container {
+.board {
+    /* Le conteneur englobant les actions et la grille */
     width: var(--board-width);
     max-width: 100%;
     margin: 0 auto 20px;
@@ -97,31 +117,87 @@ h1 {
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.8), inset 0 0 10px rgba(255, 255, 255, 0.1);
 }
 
-.board-grid {
+.column-actions {
+    /* Ligne supérieure pour les boutons de coup (Action) */
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 5px; /* Écart réduit */
+    gap: 5px;
+    padding: 5px 0;
+}
+
+.column-header {
+    /* Contient le label et le bouton */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.column-label {
+    /* Affichage du numéro de colonne */
+    font-size: 0.9em;
+    color: #AAA;
+    margin-bottom: 5px;
+}
+
+.drop-button {
+    /* Le bouton qui déclenche le coup (le formulaire POST) */
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    width: var(--cell-size); /* Largeur du bouton = taille de la cellule */
+    height: var(--cell-size);
+    /* Met le bouton au-dessus de l'emplacement de la première ligne */
+    position: relative; 
+    top: 5px; 
+    transition: transform 0.1s, box-shadow 0.2s;
+    opacity: 0.8;
+}
+
+.drop-button:hover:not(:disabled) {
+    opacity: 1;
+    transform: translateY(-5px) scale(1.05); /* Souligne la zone de jeu */
+    box-shadow: 0 5px 15px rgba(255, 140, 0, 0.5); /* Ombre de survol orange */
+}
+
+.drop-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+    transform: none;
+    box-shadow: none;
+}
+
+.token-icon {
+    /* Simule le jeton du joueur actuel dans le bouton */
+    width: 60%;
+    height: 60%;
+    border-radius: 50%;
+    margin: 0 auto;
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    transition: background-color 0.3s;
+}
+
+.token-icon.player-1 { background-color: var(--player1); }
+.token-icon.player-2 { background-color: var(--player2); }
+
+
+.board-row {
+    /* Une ligne du plateau */
+    display: flex;
+    justify-content: space-between;
 }
 
 /* Cell and Hole */
 .cell {
+    /* Le conteneur de chaque trou (pour garder un ratio carré) */
     position: relative;
-    width: 100%;
+    flex-grow: 1; /* Distribue l'espace également */
     padding-top: 100%; 
     background-color: var(--board-color); 
 }
 
-/* EFFET AJOUTÉ : Hover sur la zone de jeu (les cellules cliquables sont les boutons) */
-/* Ce style s'applique aux boutons (contrôles) au-dessus du plateau */
-.controls button:hover {
-    background-color: #A00000;
-    transform: scale(1.05);
-    /* Ajout d'une lueur légère pour le feedback visuel */
-    box-shadow: 0 0 8px rgba(255, 140, 0, 0.7); 
-}
-
-
 .hole {
+    /* Le trou (la partie vide) */
     position: absolute;
     top: 50%;
     left: 50%;
@@ -131,55 +207,37 @@ h1 {
     background-color: var(--empty); 
     border-radius: 50%;
     box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.7);
+    overflow: hidden; /* Important pour masquer l'animation 'appear' */
 }
 
 /* Pieces */
-.hole.player-1 { 
+.token {
+    /* Le jeton réel qui est dans le trou */
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    position: absolute; /* Positionné par rapport au .hole */
+    
+    /* Le jeton ne doit pas bouger une fois l'animation terminée, donc on utilise le keyframes 'appear' sur lui */
+    animation: appear 0.5s ease;
+}
+
+.hole.player-1 .token-violet { 
     background-color: var(--player1); 
     box-shadow: 0 0 10px var(--player1); 
-    animation: appear 0.5s ease; /* AJOUT de l'animation */
 }
-.hole.player-2 { 
-    background-color: var(--player2); 
-    box-shadow: 0 0 10px var(--player2); 
+.hole.player-2 .token-orange { 
+    /* Effet citrouille/lueur sur le jeton orange */
     background-image: radial-gradient(circle at 35% 35%, #FFFDD0 5%, var(--player2) 60%);
-    animation: appear 0.5s ease; /* AJOUT de l'animation */
+    box-shadow: 0 0 10px var(--player2); 
 }
 
 /* Animation d’apparition (les jetons “descendent”) */
 @keyframes appear {
-    0% { transform: translate(-50%, -150%); opacity: 0; } /* Commence beaucoup plus haut */
-    100% { transform: translate(-50%, -50%); opacity: 1; }
+    0% { transform: translateY(-150%); opacity: 0; } /* Commence beaucoup plus haut */
+    100% { transform: translateY(0); opacity: 1; }
 }
 
-/* Form Controls */
-.controls {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 5px;
-    width: var(--board-width);
-    max-width: 100%;
-    margin: 10px auto;
-}
-
-.controls button {
-    background-color: var(--blood-red); /* Boutons rouge sang */
-    color: white;
-    padding: 10px 5px;
-    border: 2px solid #500090;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background-color 0.2s, transform 0.1s;
-}
-
-.controls button:disabled {
-    background-color: #444;
-    border-color: #333;
-    cursor: not-allowed;
-    color: #888;
-    transform: scale(1);
-}
 
 /* Bouton de réinitialisation */
 .reset-button {
@@ -187,15 +245,23 @@ h1 {
     padding: 10px 20px;
     background-color: var(--player1);
     color: white;
-    border: 2px solid #500090;
+    border: 2px solid var(--blood-red);
     border-radius: 5px;
     cursor: pointer;
     font-weight: bold;
     text-decoration: none; /* Règle pour <a> */
-    display: block;
+    display: inline-block;
     text-align: center;
+    transition: background-color 0.2s;
 }
 
 .reset-button:hover {
     background-color: #6A00A8;
+}
+
+.footer-info {
+    text-align: center;
+    font-size: 0.9em;
+    color: #555;
+    margin-top: 30px;
 }
