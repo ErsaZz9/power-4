@@ -3,103 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Puissance 4 Maudit 👻 - Fête des Citrouilles</title>
-    <!-- Le lien vers la feuille de style statique (dans static/css/style.css) -->
-    <link rel="stylesheet" href="/static/css/style.css">
+    <title>Trick4Treat</title> 
+    
+    <link rel="stylesheet" href="/static/css/style.css"> 
 </head>
-
 <body>
-    <!-- Le fichier audio pour la musique d'ambiance. -->
-    <!-- 'loop' permet de rejouer la musique en boucle. 'autoplay' tente de démarrer immédiatement. -->
-    <!-- NOTE: Les navigateurs peuvent bloquer l'autoplay sans interaction utilisateur. -->
-    <audio id="background-audio" loop autoplay>
-        <!-- Vous devez placer un fichier audio comme theme.mp3 dans static/sounds/ -->
-        <source src="/static/sounds/theme.mp3" type="audio/mpeg">
-        Votre navigateur ne supporte pas l'élément audio.
-    </audio>
+    
+    <video autoplay loop muted playsinline id="bg-video">
+        <source src="/static/video/halloween_loop.mp4" type="video/mp4"> 
+        Votre navigateur ne supporte pas la vidéo de fond.
+    </video>
+    
+    <header>
+        <h1> Trick4Treat </h1> 
+    </header>
 
-    <!-- L'image de fond statique qui couvre toute la page (gérée par CSS). -->
-    <!-- Doit être placée dans static/images/ sous le nom 'fond_halloween_statique.jpg' -->
-    <img id="background-image" src="/static/images/fond_halloween_statique.jpg" alt="Fond d'écran sombre d'Halloween">
-
-    <!-- .game-overlay contient tout le contenu du jeu et flotte au-dessus du fond. -->
-    <div class="game-overlay">
-        
-        <div class="container">
-            <!-- TITRE ET STATUT DU JEU -->
-            
-            <!-- Le titre est stylisé en CSS pour un effet de lueur sanglante. -->
-            <h1>Puissance 4 Maudit</h1>
-
-            <!-- Section d'affichage des messages (tour, erreur, victoire) -->
-            <div class="message-box">
-                <!-- Le message est injecté par le serveur Go (Game.Message) -->
-                <p>{{.Message}}</p>
-                
-                <!-- Le bouton Réinitialiser s'affiche uniquement s'il y a un gagnant ou un match nul (Winner != 0) -->
-                {{if gt .Winner 0}}
-                    <a href="/reset" class="reset-button">Réinitialiser la partie</a>
-                {{end}}
-            </div>
-
-            <!-- Le plateau de jeu -->
-            <div class="board">
-                
-                <!-- Affichage des numéros de colonne et des boutons d'action (ligne supérieure) -->
-                <div class="column-actions">
-                    <!-- makeSlice 7 crée un tableau [0, 1, 2, 3, 4, 5, 6] -->
-                    <!-- $col prendra chaque index (0, 1, 2...) -->
-                    {{range $col := makeSlice 7}}
-                        <div class="column-header">
-                            <!-- addOne affiche les numéros de colonne de 1 à 7 au lieu de 0 à 6 -->
-                            <span class="column-label">{{$col | addOne}}</span>
-
-                            <!-- Formulaire d'envoi du coup -->
-                            <!-- La méthode POST est utilisée pour modifier l'état du serveur (/play) -->
-                            <form action="/play" method="POST">
-                                <!-- Champ caché pour envoyer l'index de la colonne (0 à 6) -->
-                                <input type="hidden" name="col" value="{{$col}}">
-
-                                <!-- Le bouton pour jouer. Il est désactivé si le jeu est terminé. -->
-                                <!-- Si Winner est > 0 (gagnant ou nul), le bouton est désactivé -->
-                                <button type="submit" class="drop-button" {{if gt $.Winner 0}}disabled{{end}}>
-                                    <!-- Affiche le jeton du joueur actuel (pour l'icône) -->
-                                    <div class="token-icon player-{{$.CurrentPlayer}}"></div>
-                                </button>
-                            </form>
-                        </div>
-                    {{end}}
-                </div>
-
-                <!-- AFFICHAGE DE LA GRILLE (6 lignes x 7 colonnes) -->
-                <!-- Range sur les 6 lignes (de 0 à 5) -->
-                {{range $row := makeSlice 6}}
-                    <div class="board-row">
-                        <!-- Range sur les 7 colonnes (de 0 à 6) pour chaque ligne -->
-                        {{range $col := makeSlice 7}}
-                            <!-- $val est la valeur du jeton (0, 1 ou 2) à la position [ligne][colonne] -->
-                            {{$val := index (index $.Board $row) $col}}
-                            
-                            <!-- Chaque cellule est une div. Le style (couleur) est appliqué via la classe 'player-{{$val}}' -->
-                            <div class="cell">
-                                <!-- Le trou (hole) où le jeton va tomber -->
-                                <!-- Si $val est 0 (vide), la classe est 'empty'. Sinon, 'player-1' ou 'player-2' -->
-                                <div class="hole {{if eq $val 0}}empty{{else}}player-{{$val}}{{end}}">
-                                    <!-- Si $val est 1 ou 2, on affiche le jeton (token-violet ou token-orange) -->
-                                    {{if ne $val 0}}
-                                        <div class="token token-{{if eq $val 1}}violet{{else}}orange{{end}}"></div>
-                                    {{end}}
-                                </div>
-                            </div>
-                        {{end}}
-                    </div>
-                {{end}}
-            </div>
-            
-            <!-- Information pour l'utilisateur -->
-            <p class="footer-info">Développé pour votre projet B1 - Utilisez les boutons pour jouer.</p>
+    <main id="app-container">
+        <div id="game-board" class="halloween-theme">
+            <p>La grille de 7x6 sera insérée ici.</p>
         </div>
 
-    </div>
-</body>
+        <div id="message-area">
+            <p id="game-status">Statut: Prêt à jouer!</p>
+            <p id="robot-response" class="hidden">Le Robot parle ici...</p>
+            <button id="restart-button">Recommencer la partie</button>
+        </div>
+    </main>
+
+    </body>
 </html>
