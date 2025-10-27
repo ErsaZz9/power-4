@@ -4,36 +4,47 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trick4Treat - Puissance 4 Halloween</title>
-    <!-- Chargement de Tone.js pour la bande son -->
-    <script src="https://cdn.jsdelivr.net/npm/tone@14.7.58/build/Tone.min.js"></script>
+    
     <style>
-        /* --- Styles Généraux Halloween --- */
+        html {
+            background-color: #000;
+        }
+
+        #background-video {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+            opacity: 0.8;
+        }
+
         body {
-            font-family: 'Creepster', cursive, Arial, sans-serif; /* Police spooky si disponible */
+            font-family: 'Creepster', cursive, Arial, sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            background-color: #2c003e; /* Fond Violet Ténébreux */
+            background-color: transparent;
             min-height: 100vh;
             margin: 0;
             padding: 20px;
-            color: #ff7f00; /* Texte Orange Citrouille */
-            background-image: radial-gradient(circle at center, #4b0082 0%, #2c003e 70%); /* Effet de gradient spooky */
+            color: #ff7f00;
+            position: relative;
         }
 
-        /* Police de secours pour le côté spooky (à charger si possible, sinon Arial) */
         @import url('https://fonts.googleapis.com/css2?family=Creepster&display=swap');
 
         h1 {
-            color: #ff7f00; /* Orange vif */
+            color: #ff7f00;
             margin-bottom: 5px;
-            text-shadow: 2px 2px #ff0000; /* Ombre effet "sang" */
+            text-shadow: 2px 2px #ff0000;
             font-size: 3.5rem;
             text-align: center;
         }
 
-        /* --- Message de Statut (La bannière) --- */
         #status {
             font-size: 1.5rem;
             font-weight: bold;
@@ -41,50 +52,43 @@
             margin: 15px 0;
             border-radius: 10px;
             text-align: center;
-            box-shadow: 0 0 20px rgba(255, 127, 0, 0.5); /* Lueur Orange */
-            border: 3px solid #ff0000; /* Cadre "sanglant" */
-            animation: pulse 1.5s infinite alternate; /* Animation de pulsation */
+            box-shadow: 0 0 20px rgba(255, 127, 0, 0.5);
+            border: 3px solid #ff0000;
         }
 
-        @keyframes pulse {
-            from { box-shadow: 0 0 10px #ff7f00, 0 0 20px #ff0000; }
-            to { box-shadow: 0 0 20px #ff7f00, 0 0 40px #ff0000; }
-        }
-
-        .player1-turn { /* Orange */
+        .player1-turn {
             background-color: #ff7f00;
             color: #2c003e;
         }
 
-        .player2-turn { /* Violet */
+        .player2-turn {
             background-color: #4b0082;
             color: #ff7f00;
         }
 
-        .game-over { /* Victoire/Nul */
-            background-color: #008000; /* Vert Glauque de la victoire */
+        .game-over {
+            background-color: #008000;
             color: #fff;
             border-color: #00ff00;
         }
 
-        /* --- Plateau de Jeu --- */
         #board {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
             grid-template-rows: repeat(6, 1fr);
-            border: 8px solid #333; /* Contour sombre */
+            border: 8px solid #333;
             border-radius: 15px;
-            background-color: #1a0029; /* Fond du plateau très sombre */
+            background-color: #1a0029;
             padding: 10px;
             gap: 5px;
-            box-shadow: 0 0 50px rgba(0, 0, 0, 0.8) inset; /* Ombre profonde */
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.8) inset;
             margin-bottom: 20px;
         }
 
         .cell {
             width: 70px;
             height: 70px;
-            background-color: #0d0014; /* Trou très sombre */
+            background-color: #0d0014;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -93,30 +97,19 @@
             border: 1px solid #333;
         }
 
-        .token-1 { /* Jeton Orange Citrouille */
+        .token-1 {
             background-color: #ff7f00;
             box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.8), 0 0 10px #ff7f00;
             background-image: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.3) 5%, transparent 20%);
         }
 
-        .token-2 { /* Jeton Violet Ténébreux (Robot) */
+        .token-2 {
             background-color: #4b0082;
             box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.8), 0 0 10px #4b0082;
             background-image: radial-gradient(circle at 70% 70%, rgba(255, 255, 255, 0.3) 5%, transparent 20%);
         }
         
-        /* Effet spécial: le jeton volé/spécial pulse */
-        .token-2.special-move {
-            animation: specialPulse 0.5s 6 alternate; /* Pulse 6 fois */
-            border: 3px solid #ff0000; /* Bordure rouge sang */
-        }
-
-        @keyframes specialPulse {
-            from { transform: scale(1.0); box-shadow: 0 0 20px #ff0000; }
-            to { transform: scale(1.1); box-shadow: 0 0 30px #ff0000; }
-        }
-
-        /* --- Formulaires et Boutons --- */
+        
         #play-buttons {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
@@ -158,14 +151,14 @@
         .start-button, .restart-button {
             padding: 15px 40px;
             font-size: 1.5rem;
-            background-color: #ff0000; /* Rouge Sang */
+            background-color: #ff0000;
             color: white;
-            border: 5px solid #ff7f00; /* Bordure orange */
+            border: 5px solid #ff7f00;
             border-radius: 10px;
             cursor: pointer;
             transition: background-color 0.2s, transform 0.2s;
             box-shadow: 0 8px 15px rgba(0, 0, 0, 0.6);
-            text-decoration: none; /* Pour le lien <a> */
+            text-decoration: none;
             margin-top: 30px;
         }
         
@@ -174,7 +167,6 @@
             transform: scale(1.05);
         }
         
-        /* Style spécifique pour l'écran d'accueil */
         #welcome-screen {
             display: flex;
             flex-direction: column;
@@ -189,34 +181,29 @@
     </style>
 </head>
 <body>
+    <video id="background-video" autoplay loop muted playsinline>
+        <source src="/static/video/halloween_loop.mp4" type="video/mp4">
+    </video>
+
+    
+
     <h1>Trick4Treat</h1>
 
-    <!-- Affichage du statut du jeu -->
     <div id="status" class="{{if .IsOver}}game-over{{else if eq .CurrentPlayer 1}}player1-turn{{else}}player2-turn{{end}}">
         {{.Message}}
     </div>
 
-    <!-- --- LOGIQUE D'AFFICHAGE CONDITIONNELLE --- -->
-
     {{if not .HasStarted}}
-        <!-- Écran d'accueil si le jeu n'a pas commencé -->
         <div id="welcome-screen">
-            <p style="font-size: 1.2rem; color: white;">Affrontez le Robot Hanté dans ce défi d'Halloween !</p>
-            <p style="font-size: 1.2rem; color: white;">Attention aux tours spéciaux : le Robot pourrait vous voler votre place...</p>
+            <p style="font-size: 1.2rem; color: white;">Affrontez le Caca Maléfique pour cacalloween !</p>
             <a href="/?start=true" class="start-button">JOUER</a>
         </div>
     {{else}}
-        <!-- Interface de jeu si la partie est commencée -->
-        
-        <!-- Boutons de sélection de colonne (Masqués si la partie est terminée) -->
         {{if not .IsOver}}
             <div id="play-buttons">
-                <!-- La boucle makeRange est fournie par le backend Go (main.go) -->
                 {{range $col := makeRange 0 6}}
                     <form action="/play" method="POST">
-                        <!-- Champ caché pour envoyer l'index de la colonne (0 à 6) -->
                         <input type="hidden" name="column" value="{{$col}}">
-                        <!-- Bouton de jeu. Désactivé si c'est le tour du robot. -->
                         <button type="submit" class="drop-button" {{if eq $.CurrentPlayer 2}}disabled{{end}}>
                             ▼ Col {{inc $col}}
                         </button>
@@ -224,114 +211,18 @@
                 {{end}}
             </div>
         {{end}}
-
-        <!-- Le Plateau de Jeu -->
         <div id="board">
-            {{range $row := .Board}}
-                {{range $cell := $row}}
-                    <!-- Construction de la classe CSS pour le jeton -->
-                    <div class="cell {{if eq $cell 1}}token-1{{else if eq $cell 2}}token-2{{if and (eq $cell 2) (eq $.LastMoveType "special")}} special-move{{end}}{{end}}">
+            {{range $rowIdx, $row := .Board}}
+                {{range $colIdx, $cell := $row}}
+                            <div class="cell {{if eq $cell 1}}token-1{{else if eq $cell 2}}token-2{{end}}">
                     </div>
                 {{end}}
             {{end}}
         </div>
-
-        <!-- Bouton pour rejouer (visible uniquement si la partie est terminée) -->
         {{if .IsOver}}
             <a href="/?restart=true" class="restart-button">REJOUER</a>
         {{end}}
 
     {{end}}
-
-    <!-- --- Bande Son Halloween avec Tone.js --- -->
-    <script>
-        // Le son ne peut être démarré que par une interaction de l'utilisateur.
-        
-        let isMusicPlaying = false;
-        
-        // 1. Créer le Drone d'Ambiance Ténébreux (Bruit blanc avec réverbération)
-        const spookyReverb = new Tone.Reverb({
-            decay: 10,  // Longue réverbération pour un effet d'espace
-            preDelay: 0.01,
-            wet: 0.8
-        }).toDestination();
-
-        const noise = new Tone.NoiseSynth({
-            noise: {
-                type: 'brown' // Bruit brun (fréquences basses, grésillement)
-            },
-            envelope: {
-                attack: 5,   // Attaque très lente pour un drone
-                decay: 0.1,
-                sustain: 1.0,
-                release: 10  // Longue extinction
-            }
-        }).chain(spookyReverb, Tone.Destination);
-
-        // 2. Créer un Stinger (Synthé pour les notes dissonantes/sursauts)
-        const stingerSynth = new Tone.MonoSynth({
-            oscillator: { type: 'sawtooth' },
-            envelope: {
-                attack: 0.01,
-                decay: 0.2,
-                sustain: 0,
-                release: 0.5
-            },
-            filterEnvelope: {
-                attack: 0.06,
-                decay: 0.2,
-                sustain: 0.1,
-                release: 0.5,
-                baseFrequency: 500,
-                octaves: 3
-            }
-        }).chain(spookyReverb, Tone.Destination);
-
-        function startSpookyMusic() {
-            if (isMusicPlaying) return;
-            isMusicPlaying = true;
-            
-            Tone.start();
-            
-            // Démarrer le drone d'ambiance
-            noise.triggerAttack();
-
-            // Séquence de Stingers Aléatoires (notes hautes et dissonantes)
-            // Ceci crée un événement toutes les 5 à 10 secondes (aléatoirement)
-            const dissonantNotes = ["A4", "Bb4", "E5", "C#5"];
-            
-            const randomStingerLoop = new Tone.Loop(time => {
-                // Choisir une note aléatoire
-                const note = dissonantNotes[Math.floor(Math.random() * dissonantNotes.length)];
-                
-                // Jouer la note avec une légère randomisation de la vélocité
-                stingerSynth.triggerAttackRelease(note, "8n", time, Math.random() * 0.4 + 0.3);
-
-            }, "5n"); // La boucle essaie de se déclencher toutes les 5 noires (5/4 de mesure), mais nous allons la randomiser davantage.
-
-            // La boucle `Tone.Loop` est difficile à randomiser directement pour l'intervalle, 
-            // donc on utilise setTimeout pour varier l'attente du prochain stinger.
-            function scheduleNextStinger() {
-                const randomDelay = Math.random() * 5 + 5; // Délai entre 5 et 10 secondes
-                setTimeout(() => {
-                    const note = dissonantNotes[Math.floor(Math.random() * dissonantNotes.length)];
-                    stingerSynth.triggerAttackRelease(note, "8n");
-                    scheduleNextStinger(); // Répéter
-                }, randomDelay * 1000);
-            }
-            
-            scheduleNextStinger(); 
-
-            // Tone.Transport.start(); // Pas nécessaire si on utilise uniquement des événements manuels/setTimeout
-        }
-
-        // Écoute des clics sur les boutons (JOUER, Goutte, REJOUER) pour démarrer la musique
-        const interactiveElements = document.querySelectorAll('.drop-button, .start-button, .restart-button');
-        interactiveElements.forEach(element => {
-            // Le gestionnaire d'événement 'click' est attaché à l'élément
-            element.addEventListener('click', startSpookyMusic, { once: true });
-        });
-        
-    </script>
 </body>
 </html>
